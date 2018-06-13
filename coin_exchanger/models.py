@@ -8,3 +8,6 @@ class ExchangeOrder(models.Model):
 
     recv_address = models.CharField(max_length=200)
     refund_address = models.CharField(max_length=200)
+
+    # generate from server
+    send_address = models.CharField(max_length=200, default=None, blank=True)
