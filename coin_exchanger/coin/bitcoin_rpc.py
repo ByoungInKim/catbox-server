@@ -6,6 +6,13 @@ from bitcoin.rpc import Proxy
 bitcoin.SelectParams('testnet')
 
 class BitcoinRpc():
+    bitcoin_proxy = None
+    
+    def __init__(self):
+        self.bitcoin_proxy = Proxy()
+
     def get_new_address(self):
-        bitcoin_proxy = Proxy()
-        return bitcoin_proxy.getnewaddress()
+        return self.bitcoin_proxy.getnewaddress()
+
+    def get_balance(self):
+        return self.bitcoin_proxy.getbalance()

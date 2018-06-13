@@ -9,9 +9,16 @@ class ExchangeOrderViewSet(viewsets.ModelViewSet):
     serializer_class = ExchangeOrderSerializer
 
     def create(self, request):
+        bitcoin_rpc = BitcoinRpc()
+
         request_data = request.data
-        send_address = str(BitcoinRpc().get_new_address())
+        send_address = str(bitcoin_rpc.get_new_address())
+        min_amount = 0.001
+        max_amount = bitcoin_rpc.get_balance() * 0.000000001
+
         request_data.update(send_address=send_address)
+        request_data.update(min_amount=min_amount)
+        request_data.update(max_amount=max_amount)
 
         serializer = ExchangeOrderSerializer(data=request_data)
         if serializer.is_valid():

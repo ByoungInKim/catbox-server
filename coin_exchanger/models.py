@@ -11,3 +11,7 @@ class ExchangeOrder(models.Model):
 
     # generate from server
     send_address = models.CharField(max_length=200, default=None, blank=True)
+    
+    min_amount = models.FloatField(default=0, blank=True)
+    max_amount = models.FloatField(default=0, blank=True)
+    
