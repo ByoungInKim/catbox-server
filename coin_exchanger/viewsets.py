@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
-from .models import ExchangeOrder
-from .serializers import ExchangeOrderSerializer
+from .models import ExchangeOrder, Transaction
+from .serializers import ExchangeOrderSerializer, TransactionSerializer
 from rest_framework.response import Response
 from coin_exchanger.coin.bitcoin_rpc import BitcoinRpc
 
@@ -21,6 +21,20 @@ class ExchangeOrderViewSet(viewsets.ModelViewSet):
         request_data.update(max_amount=max_amount)
 
         serializer = ExchangeOrderSerializer(data=request_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TransactionViewSet(viewsets.ModelViewSet):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+    def create(self, request):
+        request_data = request.data
+
+        serializer = TransactionSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
