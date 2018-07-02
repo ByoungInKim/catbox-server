@@ -19,17 +19,29 @@ class TransactionSerializer(serializers.ModelSerializer):
         transaction = Transaction.objects.create(**validated_data)
 
         for detail in details_data:
-            # todo - change parameter
-            detail_info = TransactionDetailInfo.objects.create(
-                account = detail['account'],
-                address = detail['address'],
-                category = detail['category'],
-                amount = detail['amount'],
-                label = detail['label'],
-                vout = detail['vout']
-            )
+            detail_info = TransactionDetailInfo.objects.create(**detail)
             transaction.details.add(detail_info)
-        return transaction
+        return transaction        
+   
+    def update(self, instance, validated_data):
+        details_data = validated_data.pop('details')
+        instance.blockhash = validated_data.get('blockhash', instance.blockhash)
+        instance.save()
+
+#        details = (instance.details).all()
+ #       details = list(details)
+  #      instance.Blockhash = 'aaa'
+        #instance.last_name = validated_data.get('last_name', instance.last_name)
+        #instance.instrument = validated_data.get('instrument', instance.instrument)
+        
+        #for detail in details_data:
+        #    album = albums.pop(0)
+        #    album.name = album_data.get('name', album.name)
+        #    album.release_date = album_data.get('release_date', album.release_date)
+        #    album.num_stars = album_data.get('num_stars', album.num_stars)
+        #    album.save()
+        #print(instance.Blockhash)
+        return instance
 
 class ExchangeOrderSerializer(serializers.ModelSerializer):
     class Meta:

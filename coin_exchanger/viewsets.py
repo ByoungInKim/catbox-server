@@ -33,10 +33,38 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         request_data = request.data
+        bitcoin_rpc = BitcoinRpc()
+        if 'txid' not in request_data:
+            return Response({ "error" : "require field(txid)" }, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = TransactionSerializer(data=request_data)
+        transaction_obj, created = Transaction.objects.get_or_create(txid=request_data['txid'])
+        transaction_data = bitcoin_rpc.get_transaction(request_data['txid'])        
+        print(transaction_data)
+        if True == created:            
+            serializer = TransactionSerializer(data=transaction_data)
+        else:
+            serializer = TransactionSerializer(transaction_obj, data=transaction_data)
+     
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def update(self, request, pk=None):
+        print('view update')
+        bitcoin_rpc = BitcoinRpc()
+        request_data = request.data
+        transaction_data = bitcoin_rpc.get_transaction(request_data['txid'])        
+        transaction_data['blockhash'] = 'abc'
+        transaction_data['blockindex'] = '3939'
+        
+        print(transaction_data)
+        transaction_obj, created = Transaction.objects.get_or_create(txid=request_data['txid'])
+        serializer = TransactionSerializer(transaction_obj, data=transaction_data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
